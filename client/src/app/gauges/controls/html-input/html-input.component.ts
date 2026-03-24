@@ -110,8 +110,9 @@ export class HtmlInputComponent extends GaugeBaseComponent {
                         val = parseFloat(val.toFixed(digit || 5));
                     }
                     if (ga.property?.variableId == sig.id) {
-                        // Do not update value if input is in focus!
-                        if (ga.property?.options?.updated && !(document.hasFocus && input.id == document.activeElement.id)) {
+                        // Do not update value if input is in focus (user is editing)
+                        const isInputFocused = document.activeElement === input;
+                        if (!isInputFocused) {
                             if (datetime) {
                                 input.value = datetime;
                             } else {
