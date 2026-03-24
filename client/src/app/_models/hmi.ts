@@ -652,6 +652,7 @@ export class Event {
     type?: string;
     ga: GaugeSettings;
     variableId: string;
+    escapePressed?: boolean = false;
 }
 
 export class DaqQuery {

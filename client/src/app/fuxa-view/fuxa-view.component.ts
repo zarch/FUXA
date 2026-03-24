@@ -654,6 +654,7 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                         self.eventForScript(events, htmlevent.value);
                     }
                 } else if (ev.key == 'Escape') {
+                    htmlevent.escapePressed = true;
                     htmlevent.dom.blur();
                 }
             };
@@ -740,17 +741,16 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private checkRestoreValue(htmlevent: Event) {
-        if (htmlevent.ga?.property?.options?.updated &&
+        // Only restore value if Escape was pressed (not after Enter)
+        // The escapePressed flag is set in the onkeydown handler when Escape is pressed
+        if (htmlevent.escapePressed && htmlevent.ga?.property?.options?.updated &&
             (htmlevent.ga.property.options.updatedEsc || htmlevent.ga.property.options.actionOnEsc === InputActionEscType.update)) {
-            //ToDo there is definitely a better way
-            setTimeout(() => {
-                const gaugeStatus = this.getGaugeStatus(htmlevent.ga);
-                const currentInputValue = gaugeStatus?.variablesValue[htmlevent.ga?.property?.variableId];
-                if (!Utils.isNullOrUndefined(currentInputValue)) {
-                    htmlevent.dom.value = currentInputValue;
-                }
-            }, 1000);
-        } else if (htmlevent.ga?.property?.options?.actionOnEsc === InputActionEscType.enter) {
+            const gaugeStatus = this.getGaugeStatus(htmlevent.ga);
+            const currentInputValue = gaugeStatus?.variablesValue[htmlevent.ga?.property?.variableId];
+            if (!Utils.isNullOrUndefined(currentInputValue)) {
+                htmlevent.dom.value = currentInputValue;
+            }
+        } else if (htmlevent.escapePressed && htmlevent.ga?.property?.options?.actionOnEsc === InputActionEscType.enter) {
             this.emulateEnterKey(htmlevent.dom);
         }
     }
