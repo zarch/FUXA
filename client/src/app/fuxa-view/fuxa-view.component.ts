@@ -660,6 +660,8 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
             };
             if (this.hmi?.layout?.inputdialog === 'true') {
                 htmlevent.dom.onfocus = function(ev) {
+                    // Reset escapePressed flag when user starts a new editing session
+                    htmlevent.escapePressed = false;
                     if (ev.currentTarget) {
                         var inputRect = ev.currentTarget.getBoundingClientRect();
 
@@ -683,6 +685,8 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                 // When input dialog is enabled, these event gets overridden (by binding of HtmlEvent) and are not called.
                 if (this.hmi.layout?.inputdialog.startsWith('keyboard') && htmlevent.ga?.type === HtmlInputComponent.TypeTag) {
                     htmlevent.dom.onfocus = function(ev) {
+                        // Reset escapePressed flag when user starts a new editing session
+                        htmlevent.escapePressed = false;
                         self.touchKeyboard.closePanel();
                         let eleRef = new ElementRef(htmlevent.dom);
                         if (htmlevent.ga?.property?.options?.numeric || htmlevent.ga?.property?.options?.type === InputOptionType.number) {
@@ -753,6 +757,9 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (htmlevent.escapePressed && htmlevent.ga?.property?.options?.actionOnEsc === InputActionEscType.enter) {
             this.emulateEnterKey(htmlevent.dom);
         }
+        // Always reset escapePressed flag after handling the blur event
+        // This ensures the flag doesn't persist across multiple editing sessions
+        htmlevent.escapePressed = false;
     }
 
     private eventForScript(events: GaugeEvent[], value: any) {
